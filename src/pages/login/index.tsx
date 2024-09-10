@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {FormStyled, InputStyled, LoginContainerStyled} from './styles'
+import {FormStyled, InputStyled, LoginContainer, LoginContainerStyled} from './styles'
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -18,9 +18,10 @@ const handleLogin = (e: React.FormEvent<HTMLDivElement>) => {
 };
 
   return (
-    <LoginContainerStyled>
+    <LoginContainer>
+      <LoginContainerStyled>
       
-      <h2>Inicia sesión para Gestionar tus citas</h2>
+      <h1>Inicia sesión para Gestionar tus citas</h1>
       <FormStyled onSubmit={handleLogin}>
         
         <InputStyled>
@@ -43,7 +44,8 @@ const handleLogin = (e: React.FormEvent<HTMLDivElement>) => {
         </InputStyled>
         <button type="submit">Login</button>
       </FormStyled>
-    </LoginContainerStyled>
+      </LoginContainerStyled>
+    </LoginContainer>
   );
 };
 
