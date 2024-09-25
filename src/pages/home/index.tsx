@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Modal from '../../components/modal';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { ActionButton, HomeContainer, StudentDetails, SubmitContainer, Table } from './styles';
 
-// Lista de alumnos con los campos de días asistidos y días totales
 const initialAlumnos = [
   { id: 1, nombreCompleto: 'Francisco Lopez', edad: 20, estado: 'Activo', genero: 'Masculino', diasAsistidos: 40, diasTotales: 50, promedio: 5.5, presenteHoy: false },
   { id: 2, nombreCompleto: 'María Luisa Rivera', edad: 21, estado: 'Inactivo', genero: 'Femenino', diasAsistidos: 35, diasTotales: 50, promedio: 4.5, presenteHoy: false },
@@ -19,9 +18,9 @@ const Home = () => {
   const navigate = useNavigate();
   const [alumnos, setAlumnos] = useState(initialAlumnos);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<typeof initialAlumnos[0] | null>(null); // Define the correct type for selectedStudent
+  const [selectedStudent, setSelectedStudent] = useState<typeof initialAlumnos[0] | null>(null);
+  const [allPresent, setAllPresent] = useState(false); 
 
-  // Maneja la vista de detalles del estudiante seleccionado
   const handleView = (id: number) => {
     const alumno = alumnos.find(a => a.id === id);
     if (alumno) {
@@ -30,12 +29,10 @@ const Home = () => {
     }
   };
 
-  // Redirige a la página de edición del alumno
   const handleEdit = (id: number) => {
     navigate(`/alumnos/${id}/editar`);
   };
 
-  // Marca o desmarca un estudiante como presente hoy
   const handleAttendanceToggle = (id: number) => {
     setAlumnos(prevAlumnos =>
       prevAlumnos.map(alumno =>
@@ -46,17 +43,16 @@ const Home = () => {
     );
   };
 
-  // Marca todos los estudiantes como presentes
-  const handleAllPresent = () => {
+  const handleAllPresentToggle = () => {
     setAlumnos(prevAlumnos =>
       prevAlumnos.map(alumno => ({
         ...alumno,
-        presenteHoy: true, // Marcar todos como presentes
+        presenteHoy: !allPresent, 
       }))
     );
+    setAllPresent(prevState => !prevState); 
   };
 
-  // Guarda la asistencia (sube los cambios y actualiza los días asistidos y totales)
   const handleSaveAttendance = () => {
     setAlumnos(prevAlumnos =>
       prevAlumnos.map(alumno =>
@@ -65,7 +61,7 @@ const Home = () => {
               ...alumno,
               diasAsistidos: alumno.diasAsistidos + 1,
               diasTotales: alumno.diasTotales + 1,
-              presenteHoy: false, // Reinicia la asistencia para el siguiente día
+              presenteHoy: false, 
             }
           : {
               ...alumno,
@@ -75,29 +71,21 @@ const Home = () => {
     );
   };
 
-  // Calcula el porcentaje de asistencia
-  const calculateAttendancePercentage = (diasAsistidos: number, diasTotales: number) => {
-    return ((diasAsistidos / diasTotales) * 100).toFixed(2) + '%';
-  };
-
-  useEffect(() => {
-    setAlumnos(prevAlumnos =>
-      prevAlumnos.map(alumno => ({
-        ...alumno,
-        porcentajeAsistencia: calculateAttendancePercentage(alumno.diasAsistidos, alumno.diasTotales),
-      }))
-    );
-  }, []);
-
   return (
     <HomeContainer>
       <h1>Lista de Alumnos</h1>
-      <button onClick={handleAllPresent}>Marcar Todos Presentes</button>
       <Table>
         <thead>
           <tr>
             <th>Nombre Completo</th>
-            <th>Asistencia</th>
+            <th>
+              Asistencia
+              <input
+                type="checkbox"
+                onChange={handleAllPresentToggle}
+                checked={allPresent} 
+              />
+            </th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -109,7 +97,7 @@ const Home = () => {
                 <input
                   type="checkbox"
                   onChange={() => handleAttendanceToggle(alumno.id)}
-                  checked={alumno.presenteHoy} // Refleja el estado de asistencia
+                  checked={alumno.presenteHoy}
                 />
                 Presente
               </td>
@@ -121,8 +109,9 @@ const Home = () => {
           ))}
         </tbody>
       </Table>
-      <button onClick={handleSaveAttendance}>Subir</button>
-
+      <SubmitContainer>
+        <button onClick={handleSaveAttendance}>Subir</button>
+      </SubmitContainer>
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -149,46 +138,3 @@ const Home = () => {
 
 export default Home;
 
-// Estilos del contenedor principal
-const HomeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-`;
-
-// Estilos de la tabla
-const Table = styled.table`
-  width: 80%;
-  border-collapse: collapse;
-  z-index: 10;
-  th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
-    text-align: center;
-  }
-`;
-
-// Estilos de los botones de acción
-const ActionButton = styled.button`
-  margin: 0 5px;
-  padding: 5px 10px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-// Estilos para los detalles del estudiante en el modal
-const StudentDetails = styled.div`
-  text-align: left;
-  h2 {
-    margin-top: 0;
-  }
-`;
