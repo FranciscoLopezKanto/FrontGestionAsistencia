@@ -30,6 +30,9 @@ export const FormStyled = styled.form`
   display: flex;
   flex-direction: column;
   gap: 15px;
+  button {
+    color: white;
+  }
 `;
 
 export const InputStyled = styled.div`
@@ -41,6 +44,7 @@ export const InputStyled = styled.div`
     width: 300px;
     height: 30px;
     border: 1px solid #ccc;
+    padding: 5px 15px;
     border-radius: 10px;
     font-size: 16px;
   }
