@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/modal';
 import { useState } from 'react';
-import { ActionButton, HomeContainer, StudentDetails, SubmitContainer, Table } from './styles';
+import { ActionButton, HomeContainer, Overlay, StudentDetails, SubmitContainer, Table } from './styles';
+import { Oval } from 'react-loader-spinner';
 
 const initialAlumnos = [
   { id: 1, nombreCompleto: 'Francisco Lopez', edad: 20, estado: 'Activo', genero: 'Masculino', diasAsistidos: 40, diasTotales: 50, promedio: 5.5, presenteHoy: false },
@@ -19,7 +20,8 @@ const Home = () => {
   const [alumnos, setAlumnos] = useState(initialAlumnos);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<typeof initialAlumnos[0] | null>(null);
-  const [allPresent, setAllPresent] = useState(false); 
+  const [allPresent, setAllPresent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Estado para el spinner de carga
 
   const handleView = (id: number) => {
     const alumno = alumnos.find(a => a.id === id);
@@ -47,28 +49,33 @@ const Home = () => {
     setAlumnos(prevAlumnos =>
       prevAlumnos.map(alumno => ({
         ...alumno,
-        presenteHoy: !allPresent, 
+        presenteHoy: !allPresent,
       }))
     );
-    setAllPresent(prevState => !prevState); 
+    setAllPresent(prevState => !prevState);
   };
 
   const handleSaveAttendance = () => {
-    setAlumnos(prevAlumnos =>
-      prevAlumnos.map(alumno =>
-        alumno.presenteHoy
-          ? {
-              ...alumno,
-              diasAsistidos: alumno.diasAsistidos + 1,
-              diasTotales: alumno.diasTotales + 1,
-              presenteHoy: false, 
-            }
-          : {
-              ...alumno,
-              diasTotales: alumno.diasTotales + 1,
-            }
-      )
-    );
+    setIsLoading(true); // Inicia el proceso de carga (spinner)
+    
+    setTimeout(() => {
+      setAlumnos(prevAlumnos =>
+        prevAlumnos.map(alumno =>
+          alumno.presenteHoy
+            ? {
+                ...alumno,
+                diasAsistidos: alumno.diasAsistidos + 1,
+                diasTotales: alumno.diasTotales + 1,
+                presenteHoy: false,
+              }
+            : {
+                ...alumno,
+                diasTotales: alumno.diasTotales + 1,
+              }
+        )
+      );
+      setIsLoading(false); // Finaliza el proceso de carga
+    }, 2000); // Simula un proceso de subida de datos con retraso
   };
 
   return (
@@ -83,7 +90,7 @@ const Home = () => {
               <input
                 type="checkbox"
                 onChange={handleAllPresentToggle}
-                checked={allPresent} 
+                checked={allPresent}
               />
             </th>
             <th>Acciones</th>
@@ -109,9 +116,23 @@ const Home = () => {
           ))}
         </tbody>
       </Table>
+
       <SubmitContainer>
         <button onClick={handleSaveAttendance}>Subir</button>
       </SubmitContainer>
+
+      {isLoading && (
+        <Overlay>
+          <Oval
+            visible={true}
+            height={80}
+            width={80}
+            color="#4fa94d"
+            ariaLabel="oval-loading"
+          />
+        </Overlay>
+      )}
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -128,7 +149,13 @@ const Home = () => {
               <p><strong>Promedio:</strong> {selectedStudent.promedio}</p>
             </StudentDetails>
           ) : (
-            'Cargando...'
+            <Oval
+              visible={true}
+              height={80}
+              width={80}
+              color="#4fa94d"
+              ariaLabel="oval-loading"
+            />
           )
         }
       />
@@ -137,4 +164,3 @@ const Home = () => {
 };
 
 export default Home;
-
