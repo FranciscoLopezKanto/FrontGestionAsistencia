@@ -1,46 +1,41 @@
-import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/modal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ActionButton, HomeContainer, Overlay, StudentDetails, SubmitContainer, Table } from './styles';
 import { Oval } from 'react-loader-spinner';
-
-const initialAlumnos = [
-  { id: 1, nombreCompleto: 'Francisco Lopez', edad: 20, estado: 'Activo', genero: 'Masculino', diasAsistidos: 40, diasTotales: 50, promedio: 5.5, presenteHoy: false },
-  { id: 2, nombreCompleto: 'María Luisa Rivera', edad: 21, estado: 'Inactivo', genero: 'Femenino', diasAsistidos: 35, diasTotales: 50, promedio: 4.5, presenteHoy: false },
-  { id: 3, nombreCompleto: 'Sylas Ronaldo Gaucho', edad: 22, estado: 'Activo', genero: 'Masculino', diasAsistidos: 45, diasTotales: 50, promedio: 6.5, presenteHoy: false },
-  { id: 4, nombreCompleto: 'Cristina Contreras', edad: 23, estado: 'Activo', genero: 'Femenino', diasAsistidos: 42, diasTotales: 50, promedio: 5.0, presenteHoy: false },
-  { id: 5, nombreCompleto: 'Javier Figueroa', edad: 24, estado: 'Inactivo', genero: 'Masculino', diasAsistidos: 38, diasTotales: 50, promedio: 3.5, presenteHoy: false },
-  { id: 6, nombreCompleto: 'Cristian Larzon', edad: 25, estado: 'Activo', genero: 'Masculino', diasAsistidos: 47, diasTotales: 50, promedio: 7.0, presenteHoy: false },
-  { id: 7, nombreCompleto: 'Carlos Figueroa', edad: 26, estado: 'Activo', genero: 'Masculino', diasAsistidos: 40, diasTotales: 50, promedio: 5.5, presenteHoy: false },
-  { id: 8, nombreCompleto: 'Carlos Soza', edad: 27, estado: 'Activo', genero: 'Masculino', diasAsistidos: 45, diasTotales: 50, promedio: 6.5, presenteHoy: false },
-];
+import { initialAlumnos } from './consts';
 
 const Home = () => {
-  const navigate = useNavigate();
   const [alumnos, setAlumnos] = useState(initialAlumnos);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<typeof initialAlumnos[0] | null>(null);
   const [allPresent, setAllPresent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Estado para el spinner de carga
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false); // Corregido
 
   const handleView = (id: number) => {
     const alumno = alumnos.find(a => a.id === id);
     if (alumno) {
       setSelectedStudent(alumno);
+      setIsEditMode(false);
       setIsModalOpen(true);
     }
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/alumnos/${id}/editar`);
+    const alumno = alumnos.find(a => a.id === id);
+    if (alumno) {
+      setSelectedStudent(alumno);
+      setIsEditMode(true);
+      setIsModalOpen(true);
+    }
   };
 
   const handleAttendanceToggle = (id: number) => {
     setAlumnos(prevAlumnos =>
       prevAlumnos.map(alumno =>
-        alumno.id === id
-          ? { ...alumno, presenteHoy: !alumno.presenteHoy }
-          : alumno
+        alumno.id === id ? { ...alumno, presenteHoy: !alumno.presenteHoy } : alumno
       )
     );
   };
@@ -55,9 +50,49 @@ const Home = () => {
     setAllPresent(prevState => !prevState);
   };
 
+  const [newStudent, setNewStudent] = useState({
+    nombreCompleto: '',
+    edad: '',
+    estado: 'Activo',
+    genero: 'Masculino',
+    diasAsistidos: 0,
+    diasTotales: 0,
+    promedio: 0,
+    presenteHoy: false,
+  });
+
+  const handleAddStudent = () => {
+    if (newStudent.nombreCompleto && newStudent.edad) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setAlumnos(prevAlumnos => [
+          ...prevAlumnos,
+          {
+            ...newStudent,
+            id: prevAlumnos.length + 1,
+            edad: parseInt(newStudent.edad),
+          },
+        ]);
+        setNewStudent({
+          nombreCompleto: '',
+          edad: '',
+          estado: 'Activo',
+          genero: 'Masculino',
+          diasAsistidos: 0,
+          diasTotales: 0,
+          promedio: 0,
+          presenteHoy: false,
+        });
+        setIsAddStudentModalOpen(false);
+        setIsLoading(false);
+      }, 2000);
+    } else {
+      alert('Por favor, completa todos los campos necesarios.');
+    }
+  };
+
   const handleSaveAttendance = () => {
-    setIsLoading(true); // Inicia el proceso de carga (spinner)
-    
+    setIsLoading(true);
     setTimeout(() => {
       setAlumnos(prevAlumnos =>
         prevAlumnos.map(alumno =>
@@ -68,14 +103,28 @@ const Home = () => {
                 diasTotales: alumno.diasTotales + 1,
                 presenteHoy: false,
               }
-            : {
-                ...alumno,
-                diasTotales: alumno.diasTotales + 1,
-              }
+            : { ...alumno, diasTotales: alumno.diasTotales + 1 }
         )
       );
-      setIsLoading(false); // Finaliza el proceso de carga
-    }, 2000); // Simula un proceso de subida de datos con retraso
+      setIsLoading(false);
+    }, 2000);
+  };
+
+  const handleSaveEdit = () => {
+    setIsSaving(true);
+    setIsModalOpen(false);
+    setTimeout(() => {
+      if (selectedStudent) {
+        setAlumnos(prevAlumnos =>
+          prevAlumnos.map(alumno =>
+            alumno.id === selectedStudent.id
+              ? { ...alumno, promedio: selectedStudent.promedio, estado: selectedStudent.estado }
+              : alumno
+          )
+        );
+        setIsSaving(false);
+      }
+    }, 2000);
   };
 
   return (
@@ -116,7 +165,9 @@ const Home = () => {
           ))}
         </tbody>
       </Table>
-
+      <SubmitContainer>
+        <button onClick={handleAddStudent}>Agregar estudiante</button>
+      </SubmitContainer>
       <SubmitContainer>
         <button onClick={handleSaveAttendance}>Subir</button>
       </SubmitContainer>
@@ -138,16 +189,53 @@ const Home = () => {
         onClose={() => setIsModalOpen(false)}
         text={
           selectedStudent ? (
-            <StudentDetails>
-              <h2>Detalles del Estudiante</h2>
-              <p><strong>Nombre Completo:</strong> {selectedStudent.nombreCompleto}</p>
-              <p><strong>Edad:</strong> {selectedStudent.edad}</p>
-              <p><strong>Estado:</strong> {selectedStudent.estado}</p>
-              <p><strong>Género:</strong> {selectedStudent.genero}</p>
-              <p><strong>Días Asistidos:</strong> {selectedStudent.diasAsistidos}</p>
-              <p><strong>Días Totales:</strong> {selectedStudent.diasTotales}</p>
-              <p><strong>Promedio:</strong> {selectedStudent.promedio}</p>
-            </StudentDetails>
+            isEditMode ? (
+              <StudentDetails>
+                <h2>Editar Alumno</h2>
+                <div>
+                  <label>Promedio:</label>
+                  <input
+                    type="number"
+                    value={selectedStudent.promedio}
+                    onChange={(e) =>
+                      setSelectedStudent({
+                        ...selectedStudent,
+                        promedio: parseFloat(e.target.value),
+                      })
+                    }
+                    min={0}
+                    max={10}
+                    step={0.1}
+                  />
+                </div>
+                <div>
+                  <label>Estado:</label>
+                  <select
+                    value={selectedStudent.estado}
+                    onChange={(e) =>
+                      setSelectedStudent({
+                        ...selectedStudent,
+                        estado: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                  </select>
+                </div>
+                <button onClick={handleSaveEdit}>Guardar Cambios</button>
+              </StudentDetails>
+            ) : (
+              <StudentDetails>
+                <h2>Detalles del Estudiante</h2>
+                <p><strong>Nombre Completo:</strong> {selectedStudent.nombreCompleto}</p>
+                <p><strong>Edad:</strong> {selectedStudent.edad}</p>
+                <p><strong>Estado:</strong> {selectedStudent.estado}</p>
+                <p><strong>Género:</strong> {selectedStudent.genero}</p>
+                <p><strong>Porcentaje de Asistencia:</strong> {((selectedStudent.diasAsistidos / selectedStudent.diasTotales) * 100).toFixed(2)}%</p>
+                <p><strong>Promedio:</strong> {selectedStudent.promedio}</p>
+              </StudentDetails>
+            )
           ) : (
             <Oval
               visible={true}
@@ -159,6 +247,18 @@ const Home = () => {
           )
         }
       />
+
+      {isSaving && (
+        <Overlay>
+          <Oval
+            visible={true}
+            height={80}
+            width={80}
+            color="#4fa94d"
+            ariaLabel="oval-loading"
+          />
+        </Overlay>
+      )}
     </HomeContainer>
   );
 };

@@ -7,6 +7,7 @@ export const HomeContainer = styled.div`
   align-items: center;
   padding: 20px;
 `;
+
 export const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -19,7 +20,6 @@ export const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
 `;
-
 
 export const Table = styled.table`
   width: 80%;
@@ -52,14 +52,80 @@ export const SubmitContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
+  
   button {
+    padding: 10px 20px;
+    background-color: #4fa94d;
     color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #3e8e41;
+    }
   }
 `;
 
 export const StudentDetails = styled.div`
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
   h2 {
-    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  div {
+    margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    label {
+      margin-bottom: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: border-color 0.3s ease;
+
+      &:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    
+    &:hover {
+      background-color: #0056b3;
+    }
   }
 `;
