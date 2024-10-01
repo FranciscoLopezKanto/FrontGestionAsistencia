@@ -15,7 +15,16 @@ export const HeaderContainer = styled.header`
   }
 
 `;
-
+export const BackButton = styled.button`
+  background-color: transparent;
+  color: black;
+  border: none;
+  padding: 5px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+`;
 export const LogoutButton = styled.button`
   background-color: #dc3545;
   color: white;

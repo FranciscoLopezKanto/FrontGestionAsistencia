@@ -5,14 +5,14 @@ export const HomeContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  
 `;
 export const HeaderStyle = styled.div`
   h1 {
     font-size: 24px;
     margin: 0;
     padding: 14px;
-    margin-left: 10px;
+    margin-bottom: 24px;
   }
 `;
 

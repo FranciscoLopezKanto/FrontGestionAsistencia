@@ -2,18 +2,15 @@ import { useState } from 'react';
 import Modal from '../../components/modal'; 
 import {  CourseCard, CourseListContainer, HeaderStyle } from './styles/index';
 import { Oval } from 'react-loader-spinner';
-import { Overlay,SubmitContainer } from '../listAlumnos/styles';
+import { Overlay,StudentDetails,SubmitContainer } from '../listAlumnos/styles';
+import { initialCourses } from './consts';
+import { semestresOptions } from './consts';
+import { useNavigate } from 'react-router-dom';
 
-const initialCourses = [
-  { id: 1, nombreCurso: 'Arquitectura de Sistemas', Semestre: 'VI' },
-  { id: 2, nombreCurso: 'Administración de Sistemas', Semestre: 'VII' },
-  { id: 3, nombreCurso: 'Diseño de Sistemas', Semestre: 'VIII' },
-  { id: 4, nombreCurso: 'Programación Orientada a Objetos', Semestre: 'IX' },
-  {id : 5, nombreCurso: 'Programación Web', Semestre: 'X'},
-];
 
 const CourseList = () => {
   const [courses, setCourses] = useState(initialCourses);
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({ nombreCurso: '', Semestre: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -36,8 +33,8 @@ const CourseList = () => {
   };
 
   const handleCourseClick = (courseId: number) => {
-    
     console.log(`Navigating to students of course ID: ${courseId}`);
+    navigate(`/home/${courseId}/alumnos`);
   };
 
   return (
@@ -61,11 +58,11 @@ const CourseList = () => {
         </Overlay>
       )}
 
-      <Modal
+<Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         text={
-          <div>
+          <StudentDetails>
             <h2>Agregar Curso</h2>
             <div>
               <label>Nombre del Curso:</label>
@@ -77,18 +74,25 @@ const CourseList = () => {
             </div>
             <div>
               <label>Semestre:</label>
-              <input
-                type="text"
+              <select
                 value={newCourse.Semestre}
                 onChange={(e) => setNewCourse({ ...newCourse, Semestre: e.target.value })}
-              />
+              >
+                <option value="">Selecciona un semestre</option>
+                {semestresOptions.map(semestre => (
+                  <option key={semestre} value={semestre}>
+                    {semestre}
+                  </option>
+                ))}
+              </select>
             </div>
             <button onClick={handleAddCourse}>Guardar Curso</button>
-          </div>
+          </StudentDetails>
         }
       />
     </HeaderStyle>
   );
 };
+
 
 export default CourseList;
