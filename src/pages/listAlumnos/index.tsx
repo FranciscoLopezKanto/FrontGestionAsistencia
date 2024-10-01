@@ -1,18 +1,29 @@
 import Modal from '../../components/modal';
-import { useState, useEffect } from 'react';
-import { ActionButton, HomeContainer, Overlay, StudentDetails, SubmitContainer, Table } from './styles';
+import { useState } from 'react';
+import { ActionButton, HeaderStyle, HomeContainer, Overlay, StudentDetails, SubmitContainer, Table } from './styles';
 import { Oval } from 'react-loader-spinner';
 import { initialAlumnos } from './consts';
 
-const Home = () => {
+const AlumsList = () => {
   const [alumnos, setAlumnos] = useState(initialAlumnos);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<typeof initialAlumnos[0] | null>(null);
   const [allPresent, setAllPresent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false); // Corregido
+  const [, setIsSaving] = useState(false);
+  
+  const [newStudent, setNewStudent] = useState({
+    nombreCompleto: '',
+    edad: '',
+    estado: 'Activo',
+    genero: 'Masculino',
+    diasAsistidos: 0,
+    diasTotales: 0,
+    promedio: 0,
+    presenteHoy: false,
+  });
 
   const handleView = (id: number) => {
     const alumno = alumnos.find(a => a.id === id);
@@ -50,17 +61,6 @@ const Home = () => {
     setAllPresent(prevState => !prevState);
   };
 
-  const [newStudent, setNewStudent] = useState({
-    nombreCompleto: '',
-    edad: '',
-    estado: 'Activo',
-    genero: 'Masculino',
-    diasAsistidos: 0,
-    diasTotales: 0,
-    promedio: 0,
-    presenteHoy: false,
-  });
-
   const handleAddStudent = () => {
     if (newStudent.nombreCompleto && newStudent.edad) {
       setIsLoading(true);
@@ -83,7 +83,7 @@ const Home = () => {
           promedio: 0,
           presenteHoy: false,
         });
-        setIsAddStudentModalOpen(false);
+        setIsAddStudentModalOpen(false); 
         setIsLoading(false);
       }, 2000);
     } else {
@@ -129,7 +129,9 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      <h1>Lista de Alumnos</h1>
+      <HeaderStyle>
+        <h1>Lista de Alumnos</h1>
+      </HeaderStyle>
       <Table>
         <thead>
           <tr>
@@ -166,9 +168,7 @@ const Home = () => {
         </tbody>
       </Table>
       <SubmitContainer>
-        <button onClick={handleAddStudent}>Agregar estudiante</button>
-      </SubmitContainer>
-      <SubmitContainer>
+        <button onClick={() => setIsAddStudentModalOpen(true)}>Agregar estudiante +</button>
         <button onClick={handleSaveAttendance}>Subir</button>
       </SubmitContainer>
 
@@ -247,20 +247,76 @@ const Home = () => {
           )
         }
       />
-
-      {isSaving && (
-        <Overlay>
-          <Oval
-            visible={true}
-            height={80}
-            width={80}
-            color="#4fa94d"
-            ariaLabel="oval-loading"
-          />
-        </Overlay>
-      )}
+      <Modal
+        isOpen={isAddStudentModalOpen}
+        onClose={() => setIsAddStudentModalOpen(false)}
+        text={
+          <StudentDetails>
+            <h2>Agregar Alumno</h2>
+            <div>
+              <label>Nombre Completo:</label>
+              <input
+                type="text"
+                value={newStudent.nombreCompleto}
+                onChange={(e) =>
+                  setNewStudent({
+                    ...newStudent,
+                    nombreCompleto: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Edad:</label>
+              <input
+                type="number"
+                value={newStudent.edad}
+                onChange={(e) =>
+                  setNewStudent({
+                    ...newStudent,
+                    edad: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Género:</label>
+              <select
+                value={newStudent.genero}
+                onChange={(e) =>
+                  setNewStudent({
+                    ...newStudent,
+                    genero: e.target.value,
+                  })
+                }
+              >
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+            <div>
+              <label>Estado:</label>
+              <select
+                value={newStudent.estado}
+                onChange={(e) =>
+                  setNewStudent({
+                    ...newStudent,
+                    estado: e.target.value,
+                  })
+                }
+              >
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+            <button onClick={handleAddStudent}>Agregar</button>
+          </StudentDetails>
+        }
+      />
     </HomeContainer>
   );
 };
 
-export default Home;
+export default AlumsList;

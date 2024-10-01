@@ -1,16 +1,20 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Home from './pages/home';
+import AlumsList from './pages/listAlumnos';
 import Login from './pages/login';
+import CourseList from './pages/listCursos';
+import Layout from './components/layout';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
+        <Route element={<Layout />}>
+          <Route path="/home" element={<AlumsList />} />
+          <Route path="/list" element={<CourseList />} />
+        </Route>
       </Routes>
-
     </Router>
   );
 }

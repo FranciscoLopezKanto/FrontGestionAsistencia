@@ -7,6 +7,14 @@ export const HomeContainer = styled.div`
   align-items: center;
   padding: 20px;
 `;
+export const HeaderStyle = styled.div`
+  h1 {
+    font-size: 24px;
+    margin: 0;
+    padding: 14px;
+    margin-left: 10px;
+  }
+`;
 
 export const Overlay = styled.div`
   position: fixed;
@@ -48,11 +56,12 @@ export const ActionButton = styled.button`
 
 export const SubmitContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  gap: 16px;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  
+
   button {
     padding: 10px 20px;
     background-color: #4fa94d;
@@ -60,7 +69,7 @@ export const SubmitContainer = styled.div`
     font-size: 16px;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     
     &:hover {
@@ -102,7 +111,7 @@ export const StudentDetails = styled.div`
       padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 10px;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: border-color 0.3s ease;
 

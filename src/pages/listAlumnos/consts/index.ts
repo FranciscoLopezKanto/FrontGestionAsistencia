@@ -7,6 +7,5 @@ export const initialAlumnos = [
     { id: 6, nombreCompleto: 'Cristian Larzon', edad: 25, estado: 'Activo', genero: 'Masculino', diasAsistidos: 47, diasTotales: 50, promedio: 7.0, presenteHoy: false },
     { id: 7, nombreCompleto: 'Carlos Figueroa', edad: 26, estado: 'Activo', genero: 'Masculino', diasAsistidos: 40, diasTotales: 50, promedio: 5.5, presenteHoy: false },
     { id: 8, nombreCompleto: 'Carlos Soza', edad: 27, estado: 'Activo', genero: 'Masculino', diasAsistidos: 45, diasTotales: 50, promedio: 6.5, presenteHoy: false },
-    
   ];
   

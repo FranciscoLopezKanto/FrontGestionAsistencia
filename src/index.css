@@ -6,8 +6,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0%;
 }
-
+body {
+  margin: 0;
+}
 a {
   font-weight: 500;
   color: #646cff;
