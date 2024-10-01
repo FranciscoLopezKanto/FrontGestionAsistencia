@@ -1,20 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from '../../components/modal'; 
-import {  CourseCard, CourseListContainer, HeaderStyle } from './styles/index';
+import { CourseCard, CourseListContainer, HeaderStyle } from './styles/index';
 import { Oval } from 'react-loader-spinner';
-import { Overlay,StudentDetails,SubmitContainer } from '../listAlumnos/styles';
-import { initialCourses } from './consts';
-import { semestresOptions } from './consts';
+import { Overlay, StudentDetails, SubmitContainer } from '../listAlumnos/styles';
+import { initialCourses, semestresOptions } from './consts';
 import { useNavigate } from 'react-router-dom';
-
+import fetchSubjects from '../../api/query/cursos/index';
 
 const CourseList = () => {
   const [courses, setCourses] = useState(initialCourses);
-  const navigate = useNavigate();
+  const [subjects, setSubjects] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({ nombreCurso: '', Semestre: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const getSubjects = async () => {
+      setIsLoading(true); // Inicia el loading
+      try {
+        const data = await fetchSubjects(); 
+        console.log(data); // Puedes ver los datos en la consola
+        setSubjects(data); 
+      } catch (error) {
+        console.error('Error fetching subjects:', error);
+      } finally {
+        setIsLoading(false); // Finaliza el loading
+      }
+    };
+
+    getSubjects();
+  }, []);
+  console.log(subjects);
   const handleAddCourse = () => {
     if (newCourse.nombreCurso && newCourse.Semestre) {
       setIsLoading(true);
@@ -58,7 +75,7 @@ const CourseList = () => {
         </Overlay>
       )}
 
-<Modal
+      <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         text={
@@ -93,6 +110,5 @@ const CourseList = () => {
     </HeaderStyle>
   );
 };
-
 
 export default CourseList;
