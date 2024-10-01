@@ -5,7 +5,7 @@ import { Oval } from 'react-loader-spinner';
 import { Overlay, StudentDetails, SubmitContainer } from '../listAlumnos/styles';
 import { initialCourses, semestresOptions } from './consts';
 import { useNavigate } from 'react-router-dom';
-import fetchSubjects from '../../api/query/cursos/index';
+import { fetchSubjects } from '../../api/query/cursos/index';
 
 const CourseList = () => {
   const [courses, setCourses] = useState(initialCourses);
