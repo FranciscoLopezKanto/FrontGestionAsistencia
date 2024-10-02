@@ -1,8 +1,7 @@
-// apolloClient.js
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 const client = new ApolloClient({
-  uri: 'https://increasing-bin-exhibition-gis.trycloudflare.com/graphql', 
+  uri: 'https://alan-authentic-lawn-ut.trycloudflare.com/graphql', 
   cache: new InMemoryCache(),
 });
 

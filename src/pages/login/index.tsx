@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormStyled, InputStyled, LoginContainer, LoginContainerStyled } from './styles';
+import { loginUser } from '../../api/mutation/login';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const Login: React.FC = () => {
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (username === 'user' && password === 'password') {
-      console.log('Login correcto');
-      navigate('/home');
-    } else {
-      alert('Credenciales incorrectas');
+    console.log('Login:', username, password);
+    try {
+      const loginResponse = await loginUser(username, password);
+      
+      if (loginResponse && loginResponse.token) {
+        console.log('Login correcto');
+        navigate('/home');
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    } catch (error) {
+      console.error('Error en la autenticación:', error);
+      alert('Ocurrió un error durante el inicio de sesión.');
     }
   };
 

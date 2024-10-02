@@ -3,15 +3,15 @@ import Modal from '../../components/modal';
 import { CourseCard, CourseListContainer, HeaderStyle } from './styles/index';
 import { Oval } from 'react-loader-spinner';
 import { Overlay, StudentDetails, SubmitContainer } from '../listAlumnos/styles';
-import { initialCourses, semestresOptions } from './consts';
+import { initialCourses } from './consts';
 import { useNavigate } from 'react-router-dom';
 import { fetchSubjects } from '../../api/query/cursos/index';
 
 const CourseList = () => {
-  const [courses, setCourses] = useState(initialCourses);
+  const [, setCourses] = useState<{ id: number; nombreCurso: string; Semestre: string; }[]>(initialCourses);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCourse, setNewCourse] = useState({ nombreCurso: '', Semestre: '' });
+  const [newCourse, setNewCourse] = useState({ nombreAsignatura: '', numeroClases: '' });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -20,32 +20,41 @@ const CourseList = () => {
       setIsLoading(true); // Inicia el loading
       try {
         const data = await fetchSubjects(); 
-        console.log(data); // Puedes ver los datos en la consola
-        setSubjects(data); 
+        console.log(data); 
+
+        if (data.length === 0) {
+          setSubjects([{ id: 1, name: 'Example', numberOfClasses: 0 }]);
+        } else {
+          setSubjects(data); 
+        }
       } catch (error) {
         console.error('Error fetching subjects:', error);
+        setSubjects([{ id: 1, name: 'Example', numberOfClasses: 0 }]);
       } finally {
-        setIsLoading(false); // Finaliza el loading
+        setIsLoading(false); 
       }
     };
 
     getSubjects();
   }, []);
+
   console.log(subjects);
+
   const handleAddCourse = () => {
-    if (newCourse.nombreCurso && newCourse.Semestre) {
+    const numeroClasesFloat = parseFloat(newCourse.numeroClases);
+    if (newCourse.nombreAsignatura && !isNaN(numeroClasesFloat)) {
       setIsLoading(true);
       setTimeout(() => {
         setCourses(prevCourses => [
           ...prevCourses,
-          { ...newCourse, id: prevCourses.length + 1, alumnos: [] },
+          { id: prevCourses.length + 1, nombreCurso: newCourse.nombreAsignatura, Semestre: '', numberOfClasses: numeroClasesFloat },
         ]);
-        setNewCourse({ nombreCurso: '', Semestre: '' });
+        setNewCourse({ nombreAsignatura: '', numeroClases: '' });
         setIsModalOpen(false);
         setIsLoading(false);
       }, 2000);
     } else {
-      alert('Por favor, completa todos los campos necesarios.');
+      alert('Por favor, completa todos los campos correctamente.');
     }
   };
 
@@ -58,15 +67,15 @@ const CourseList = () => {
     <HeaderStyle>
       <h1>Lista de Cursos</h1>
       <CourseListContainer>
-        {courses.map(course => (
-          <CourseCard key={course.id} onClick={() => handleCourseClick(course.id)}>
-            <h3>{course.nombreCurso}</h3>
-            <p>Semestre: {course.Semestre}</p>
+        {subjects.map(subject => (
+          <CourseCard key={subject.id} onClick={() => handleCourseClick(subject.id)}>
+            <h3>{subject.name}</h3>
+            <p>Numero de clases: {subject.numberOfClasses}</p>
           </CourseCard>
         ))}
       </CourseListContainer>
       <SubmitContainer>
-        <button onClick={() => setIsModalOpen(true)}>Agregar Curso +</button>
+        <button onClick={() => setIsModalOpen(true)}>Agregar Asignatura +</button>
       </SubmitContainer>
 
       {isLoading && (
@@ -80,30 +89,24 @@ const CourseList = () => {
         onClose={() => setIsModalOpen(false)}
         text={
           <StudentDetails>
-            <h2>Agregar Curso</h2>
+            <h2>Agregar Asignatura</h2>
             <div>
-              <label>Nombre del Curso:</label>
+              <label>Nombre de la Asignatura:</label>
               <input
                 type="text"
-                value={newCourse.nombreCurso}
-                onChange={(e) => setNewCourse({ ...newCourse, nombreCurso: e.target.value })}
+                value={newCourse.nombreAsignatura}
+                onChange={(e) => setNewCourse({ ...newCourse, nombreAsignatura: e.target.value })}
               />
             </div>
             <div>
-              <label>Semestre:</label>
-              <select
-                value={newCourse.Semestre}
-                onChange={(e) => setNewCourse({ ...newCourse, Semestre: e.target.value })}
-              >
-                <option value="">Selecciona un semestre</option>
-                {semestresOptions.map(semestre => (
-                  <option key={semestre} value={semestre}>
-                    {semestre}
-                  </option>
-                ))}
-              </select>
+              <label>Número de Clases:</label>
+              <input
+                type="text"
+                value={newCourse.numeroClases}
+                onChange={(e) => setNewCourse({ ...newCourse, numeroClases: e.target.value })}
+              />
             </div>
-            <button onClick={handleAddCourse}>Guardar Curso</button>
+            <button onClick={handleAddCourse}>Guardar Asignatura</button>
           </StudentDetails>
         }
       />
